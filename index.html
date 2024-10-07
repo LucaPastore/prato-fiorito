@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        #container {
+            width: 500px;
+        }
+
+        .base {
+            background-color: blue;
+            width: 48px;
+            height: 48px;
+            border: 1px solid black;
+            float: left;
+        }
+
+        .base:hover {
+            opacity: 0.5;
+        }
+
+        .empty {
+            background-color: rgb(214, 214, 221);
+            width: 48px;
+            height: 48px;
+            border: 1px solid black;
+            float: left;
+            font-size: 35px;
+            text-align: center;
+        }
+
+        .death {
+            background-color: red;
+            width: 48px;
+            height: 48px;
+            border: 1px solid black;
+            float: left;
+        }
+
+        .bomb {
+            background-color: orange;
+            width: 48px;
+            height: 48px;
+            border: 1px solid black;
+            float: left;
+        }
+
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            padding-top: 100px;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 400px;
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .n_bomb {
+            margin-left: 530px;
+            font-size: 30px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .super-container {
+            width: 800px;
+            height: 600px;
+            background-color: skyblue;
+            margin: auto;
+            padding: 20px;
+            border-radius: 5%;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>PRATO SFOLTITO</h1>
+    <div class="super-container">
+        <div id="container">
+
+
+
+
+
+        </div>
+
+        <p class="n_bomb">
+            Numero Bombe: <span id="n_bomb"></span>
+        </p>
+    </div>
+
+
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="testo">HAI PERSO,  MA TI AMO LO STESSO</p>
+        </div>
+
+    </div>
+
+    <script>
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+        span.onclick = function () {
+            modal.style.display = "none";
+            location.reload();
+        }
+
+        let matrice = [];
+        let matriceConteggi = [];
+        let container = document.getElementById("container");
+        let tile_size = 100;
+        let tile_num = 10;
+        let n_bomb = 0;
+        let empty = 0;
+        for (let i = 0; i < tile_num; i++) {
+            let vettore = [];
+            let vettoreConteggi = [];
+            for (let j = 0; j < tile_num; j++) {
+                container.innerHTML += "<div id='" + i + j + "' class='base'> </div>";
+                vettore[j] = 0;
+                vettoreConteggi[j] = 0;
+            }
+            matrice[i] = vettore;
+            matriceConteggi[i] = vettoreConteggi;
+        }
+        insertBomb(matrice, 20);
+        document.getElementById("n_bomb").innerHTML = n_bomb;
+        console.log(matriceConteggi);
+
+
+        var list = document.getElementsByClassName("base");
+        for (let item of list) {
+            item.addEventListener("click", function azione() {
+                let coordinate = item.id.split('');
+                let x = parseInt(coordinate[0]);
+                let y = parseInt(coordinate[1]);
+                if (item.classList.contains("base")) {
+                    if (matrice[x][y] == 0) {
+                        item.classList.remove("base");
+                        item.classList.add("empty");
+                        item.removeEventListener("click", azione);
+                        document.getElementById('' + x + y).innerHTML = matriceConteggi[x][y];
+                        empty++;
+                        if (empty + n_bomb == 100) {
+                            modal.style.display = "block";
+                            document.getElementById("testo").innerHTML = "HAI VINTO !";
+                        }
+                    }
+                    else {
+                        item.classList.remove("base");
+                        item.classList.add("death");
+                        modal.style.display = "block";
+                    }
+                }
+
+            });
+
+            item.addEventListener("contextmenu", function tasto(ev) {
+                ev.preventDefault(); //per non far comparire il menù che compare cliccando il tasto destro
+                if (item.classList.contains("base")) {
+                    item.classList.remove("base");
+                    item.classList.add("bomb");
+                }
+                else if (item.classList.contains("bomb")) {
+                    item.classList.remove("bomb");
+                    item.classList.add("base");
+                }
+            });
+        }
+
+
+
+        function insertBomb(matrice, max_bomb) {
+            for (let i = 0; i < max_bomb; i++) {
+                let x = Math.floor(Math.random() * 10);
+                let y = Math.floor(Math.random() * 10);
+                console.log("x=" + x + "\ty=" + y);
+                if (matrice[x][y] == 0) {
+                    matrice[x][y] = 1;
+                    addNumber(x, y);
+                    n_bomb++;
+                }
+            }
+        }
+
+        // function addNumber(x, y) {
+        //     try {
+        //         matriceConteggi[x + 1][y]++;
+        //     } catch (err) {
+        //         console.log("error");
+        //     }
+        //     try {
+        //         matriceConteggi[x + 1][y + 1]++;
+        //     } catch (err) {
+        //         console.log("error");
+        //     }
+        //     try {
+        //         matriceConteggi[x][y + 1]++;
+        //     } catch (err) {
+        //         console.log("error");
+        //     }
+        //     try {
+        //         matriceConteggi[x - 1][y + 1]++;
+        //     } catch (err) {
+        //         console.log("error");
+        //     }
+        //     try {
+        //         matriceConteggi[x - 1][y - 1]++;
+        //     } catch (err) {
+        //         console.log("error");
+        //     }
+        //     try {
+        //         matriceConteggi[x][y - 1]++;
+        //     } catch (err) {
+        //         console.log("error");
+        //     }
+
+        //     try {
+        //         matriceConteggi[x + 1][y - 1]++;
+        //     } catch (err) {
+        //         console.log("error");
+        //     }
+
+        //     try {
+        //         matriceConteggi[x - 1][y]++;
+        //     } catch (err) {
+        //         console.log("error");
+        //     }
+        // }
+
+        function addNumber(x, y) {
+            if (x + 1 < 10) {
+                matriceConteggi[x + 1][y]++;
+            }
+            if (x + 1 < 10 && y + 1 < 10) {
+                matriceConteggi[x + 1][y + 1]++;
+            }
+            if (y + 1 < 10) {
+                matriceConteggi[x][y + 1]++;
+            }
+            if (x - 1 >= 0 && y + 1 < 10) {
+                matriceConteggi[x - 1][y + 1]++;
+            }
+            if (x - 1 >= 0 && y - 1 >= 0) {
+                matriceConteggi[x - 1][y - 1]++;
+            }
+            if (y - 1 >= 0) {
+                matriceConteggi[x][y - 1]++;
+            }
+            if (x + 1 < 10 && y - 1 >= 0) {
+                matriceConteggi[x + 1][y - 1]++;
+            }
+            if (x - 1 >= 0) {
+                matriceConteggi[x - 1][y]++;
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
