@@ -41,7 +41,7 @@
         }
 
         .bomb {
-            background-color: orange;
+            background-color: pink;
             width: 48px;
             height: 48px;
             border: 1px solid black;
@@ -196,7 +196,10 @@
 
             });
 
-            item.addEventListener("contextmenu", function tasto(ev) {
+            item.addEventListener("dblclick", toggleBomb);
+            item.addEventListener("contextmenu", toggleBomb)
+
+            function toggleBomb(ev) {
                 ev.preventDefault(); //per non far comparire il menù che compare cliccando il tasto destro
                 if (item.classList.contains("base")) {
                     item.classList.remove("base");
@@ -206,7 +209,7 @@
                     item.classList.remove("bomb");
                     item.classList.add("base");
                 }
-            });
+            }
         }
 
 
